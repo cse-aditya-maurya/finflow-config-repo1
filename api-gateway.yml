@@ -118,8 +118,6 @@
 
 
 
-
-
 server:
   port: 8080
 
@@ -129,7 +127,6 @@ spring:
 
   cloud:
     gateway:
-
       routes:
 
         # 🔐 AUTH SERVICE
@@ -164,7 +161,6 @@ spring:
           filters:
             - StripPrefix=1
 
-      # 🌍 GLOBAL CORS
       globalcors:
         corsConfigurations:
           '[/**]':
@@ -180,54 +176,31 @@ spring:
     discovery:
       locator:
         enabled: false
-        lower-case-service-id: true
 
 # 🔥 Eureka
 eureka:
-  instance:
-    prefer-ip-address: true
-
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
 
-# 🔥 Swagger Aggregation (FIXED)
+# 🔥 Swagger Aggregation
 springdoc:
-
   api-docs:
-    enabled: false   # 🚨 VERY IMPORTANT (disable gateway default docs)
+    enabled: false
 
   swagger-ui:
     path: /swagger-ui.html
-    config-url: /v3/api-docs/swagger-config
-
     urls:
       - name: AUTH SERVICE
         url: /auth/v3/api-docs
-
       - name: APPLICATION SERVICE
         url: /applications/v3/api-docs
-
       - name: DOCUMENT SERVICE
         url: /documents/v3/api-docs
-
       - name: ADMIN SERVICE
         url: /admin/v3/api-docs
 
-# 🔥 Logging (optional but useful)
-logging:
-  level:
-    org.springframework.cloud.gateway: DEBUG
-    reactor.netty.http.client: DEBUG
-
-# 🔥 Actuator
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-
-# 🔐 JWT (for gateway validation)
+# 🔐 JWT
 jwt:
   secret: finflow_super_secure_jwt_secret_key_2026_project_backend
   expiration: 86400000
