@@ -120,10 +120,6 @@
 
 
 
-
-
-
-
 server:
   port: 8080
 
@@ -178,6 +174,7 @@ spring:
               - POST
               - PUT
               - DELETE
+              - OPTIONS
             allowedHeaders: "*"
 
     discovery:
@@ -194,21 +191,30 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka/
 
-# 🔥 Swagger Aggregation (FIXED ✅)
+# 🔥 Swagger Aggregation (FIXED)
 springdoc:
+
+  api-docs:
+    enabled: false   # 🚨 VERY IMPORTANT (disable gateway default docs)
+
   swagger-ui:
     path: /swagger-ui.html
+    config-url: /v3/api-docs/swagger-config
+
     urls:
       - name: AUTH SERVICE
         url: /auth/v3/api-docs
+
       - name: APPLICATION SERVICE
         url: /applications/v3/api-docs
+
       - name: DOCUMENT SERVICE
         url: /documents/v3/api-docs
+
       - name: ADMIN SERVICE
         url: /admin/v3/api-docs
 
-# 🔥 Logging
+# 🔥 Logging (optional but useful)
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG
@@ -221,7 +227,7 @@ management:
       exposure:
         include: "*"
 
-# 🔐 JWT (for later)
+# 🔐 JWT (for gateway validation)
 jwt:
   secret: finflow_super_secure_jwt_secret_key_2026_project_backend
   expiration: 86400000
