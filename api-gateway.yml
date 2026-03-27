@@ -72,13 +72,17 @@ springdoc:
     path: /swagger-ui.html
     urls:
       - name: auth-service
-        url: /auth/v3/api-docs
+        # url: /auth/v3/api-docs
+        url: http://localhost:8081/auth/v3/api-docs
       - name: application-service
-        url: /applications/v3/api-docs
+        # url: /applications/v3/api-docs
+        url: http://localhost:8081/applications/v3/api-docs
       - name: document-service
-        url: /documents/v3/api-docs
+        # url: /documents/v3/api-docs
+        url: http://localhost:8081/documents/v3/api-docs
       - name: admin-service
-        url: /admin/v3/api-docs
+        # url: /admin/v3/api-docs
+        url: http://localhost:8081/admin/v3/api-docs
 
 # 🔥 Logging
 logging:
