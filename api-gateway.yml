@@ -113,94 +113,195 @@
 
 
 
-
-
-
-
-
 server:
   port: 8080
 
 spring:
   application:
     name: api-gateway
-
+  
   cloud:
     gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      
       routes:
-
-        # 🔐 AUTH SERVICE
-        - id: auth-service
+        # ==================== AUTH SERVICE ====================
+        - id: auth-service-api
           uri: lb://auth-service
           predicates:
             - Path=/auth/**
           filters:
-            - StripPrefix=1
-
-        # 📄 APPLICATION SERVICE
-        - id: application-service
+            - StripPrefix=0
+            - name: Retry
+              args:
+                retries: 3
+                statuses: INTERNAL_SERVER_ERROR
+                methods: GET,POST,PUT,DELETE
+        
+        # Auth Service Swagger Route
+        - id: auth-service-swagger
+          uri: lb://auth-service
+          predicates:
+            - Path=/auth/v3/api-docs/**
+          filters:
+            - RewritePath=/auth/v3/api-docs/(?<remaining>.*), /v3/api-docs/${remaining}
+        
+        # Auth Service Swagger Root
+        - id: auth-service-swagger-root
+          uri: lb://auth-service
+          predicates:
+            - Path=/auth/v3/api-docs
+          filters:
+            - RewritePath=/auth/v3/api-docs, /v3/api-docs
+        
+        # ==================== APPLICATION SERVICE ====================
+        - id: application-service-api
           uri: lb://application-service
           predicates:
             - Path=/applications/**
           filters:
-            - StripPrefix=1
-
-        # 📁 DOCUMENT SERVICE
-        - id: document-service
+            - StripPrefix=0
+            - name: Retry
+              args:
+                retries: 3
+                statuses: INTERNAL_SERVER_ERROR
+                methods: GET,POST,PUT,DELETE
+        
+        # Application Service Swagger Route
+        - id: application-service-swagger
+          uri: lb://application-service
+          predicates:
+            - Path=/applications/v3/api-docs/**
+          filters:
+            - RewritePath=/applications/v3/api-docs/(?<remaining>.*), /v3/api-docs/${remaining}
+        
+        # Application Service Swagger Root
+        - id: application-service-swagger-root
+          uri: lb://application-service
+          predicates:
+            - Path=/applications/v3/api-docs
+          filters:
+            - RewritePath=/applications/v3/api-docs, /v3/api-docs
+        
+        # ==================== DOCUMENT SERVICE ====================
+        - id: document-service-api
           uri: lb://document-service
           predicates:
             - Path=/documents/**
           filters:
-            - StripPrefix=1
-
-        # 🧑‍💼 ADMIN SERVICE
-        - id: admin-service
+            - StripPrefix=0
+            - name: Retry
+              args:
+                retries: 3
+                statuses: INTERNAL_SERVER_ERROR
+                methods: GET,POST,PUT,DELETE
+        
+        # Document Service Swagger Route
+        - id: document-service-swagger
+          uri: lb://document-service
+          predicates:
+            - Path=/documents/v3/api-docs/**
+          filters:
+            - RewritePath=/documents/v3/api-docs/(?<remaining>.*), /v3/api-docs/${remaining}
+        
+        # Document Service Swagger Root
+        - id: document-service-swagger-root
+          uri: lb://document-service
+          predicates:
+            - Path=/documents/v3/api-docs
+          filters:
+            - RewritePath=/documents/v3/api-docs, /v3/api-docs
+        
+        # ==================== ADMIN SERVICE ====================
+        - id: admin-service-api
           uri: lb://admin-service
           predicates:
             - Path=/admin/**
           filters:
-            - StripPrefix=1
+            - StripPrefix=0
+            - name: Retry
+              args:
+                retries: 3
+                statuses: INTERNAL_SERVER_ERROR
+                methods: GET,POST,PUT,DELETE
+        
+        # Admin Service Swagger Route
+        - id: admin-service-swagger
+          uri: lb://admin-service
+          predicates:
+            - Path=/admin/v3/api-docs/**
+          filters:
+            - RewritePath=/admin/v3/api-docs/(?<remaining>.*), /v3/api-docs/${remaining}
+        
+        # Admin Service Swagger Root
+        - id: admin-service-swagger-root
+          uri: lb://admin-service
+          predicates:
+            - Path=/admin/v3/api-docs
+          filters:
+            - RewritePath=/admin/v3/api-docs, /v3/api-docs
 
-      globalcors:
-        corsConfigurations:
-          '[/**]':
-            allowedOrigins: "*"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - OPTIONS
-            allowedHeaders: "*"
-
-    discovery:
-      locator:
-        enabled: false
-
-# 🔥 Eureka
+# Eureka Client Configuration
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+    registry-fetch-interval-seconds: 10
+  instance:
+    hostname: localhost
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
 
-# 🔥 Swagger Aggregation
+# Swagger Configuration
 springdoc:
   api-docs:
-    enabled: false
-
+    path: /v3/api-docs
+    enabled: true
   swagger-ui:
     path: /swagger-ui.html
+    enabled: true
     urls:
-      - name: AUTH SERVICE
+      - name: Auth Service
         url: /auth/v3/api-docs
-      - name: APPLICATION SERVICE
+      - name: Application Service
         url: /applications/v3/api-docs
-      - name: DOCUMENT SERVICE
+      - name: Document Service
         url: /documents/v3/api-docs
-      - name: ADMIN SERVICE
+      - name: Admin Service
         url: /admin/v3/api-docs
+    urls-primary-name: Auth Service
+    try-it-out-enabled: true
+    operations-sorter: method
+    tags-sorter: alpha
+    doc-expansion: none
+    default-model-expand-depth: 0
+    default-models-expand-depth: 0
 
-# 🔐 JWT
-jwt:
-  secret: finflow_super_secure_jwt_secret_key_2026_project_backend
-  expiration: 86400000
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway,routes
+      base-path: /actuator
+  endpoint:
+    gateway:
+      enabled: true
+    health:
+      show-details: always
+
+# Logging Configuration
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO
+    org.springframework.web: INFO
+    com.finflow.gateway: DEBUG
+    org.springdoc: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
