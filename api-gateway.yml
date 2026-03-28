@@ -111,7 +111,6 @@
 
 
 
-
 server:
   port: 8080
 
@@ -121,89 +120,35 @@ spring:
   
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: true
-          lower-case-service-id: true
-      
       routes:
-        # ==================== ADMIN SERVICE - MUST COME FIRST ====================
-        # Admin Service Swagger (Exact match)
-        - id: admin-service-swagger-exact
-          uri: lb://admin-service
-          predicates:
-            - Path=/admin/v3/api-docs
-          filters:
-            - RewritePath=/admin/v3/api-docs, /v3/api-docs
-        
-        # Admin Service Swagger (With trailing slash)
-        - id: admin-service-swagger-slash
-          uri: lb://admin-service
-          predicates:
-            - Path=/admin/v3/api-docs/
-          filters:
-            - RewritePath=/admin/v3/api-docs/, /v3/api-docs/
-        
-        # Admin Service API Routes
-        - id: admin-service-api
-          uri: lb://admin-service
-          predicates:
-            - Path=/admin/**
-          filters:
-            - StripPrefix=0
-        
-        # ==================== AUTH SERVICE ====================
-        # Auth Service Swagger
-        - id: auth-service-swagger
-          uri: lb://auth-service
-          predicates:
-            - Path=/auth/v3/api-docs
-          filters:
-            - RewritePath=/auth/v3/api-docs, /v3/api-docs
-        
-        # Auth Service API
-        - id: auth-service-api
+        - id: auth-service
           uri: lb://auth-service
           predicates:
             - Path=/auth/**
           filters:
             - StripPrefix=0
-        
-        # ==================== APPLICATION SERVICE ====================
-        # Application Service Swagger
-        - id: application-service-swagger
-          uri: lb://application-service
-          predicates:
-            - Path=/applications/v3/api-docs
-          filters:
-            - RewritePath=/applications/v3/api-docs, /v3/api-docs
-        
-        # Application Service API
-        - id: application-service-api
+            
+        - id: application-service
           uri: lb://application-service
           predicates:
             - Path=/applications/**
           filters:
             - StripPrefix=0
-        
-        # ==================== DOCUMENT SERVICE ====================
-        # Document Service Swagger
-        - id: document-service-swagger
-          uri: lb://document-service
-          predicates:
-            - Path=/documents/v3/api-docs
-          filters:
-            - RewritePath=/documents/v3/api-docs, /v3/api-docs
-        
-        # Document Service API
-        - id: document-service-api
+            
+        - id: document-service
           uri: lb://document-service
           predicates:
             - Path=/documents/**
           filters:
             - StripPrefix=0
+            
+        - id: admin-service
+          uri: lb://admin-service
+          predicates:
+            - Path=/admin/**
+          filters:
+            - StripPrefix=0
 
-# Eureka Configuration
 eureka:
   client:
     service-url:
@@ -214,14 +159,9 @@ eureka:
     hostname: localhost
     prefer-ip-address: true
 
-# Swagger Configuration
 springdoc:
-  api-docs:
-    path: /v3/api-docs
-    enabled: true
   swagger-ui:
     path: /swagger-ui.html
-    enabled: true
     urls:
       - name: Auth Service
         url: /auth/v3/api-docs
@@ -231,11 +171,7 @@ springdoc:
         url: /documents/v3/api-docs
       - name: Admin Service
         url: /admin/v3/api-docs
-    urls-primary-name: Auth Service
-    try-it-out-enabled: true
 
-# Logging
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG
-    org.springframework.web: DEBUG
