@@ -1,9 +1,11 @@
 server:
   port: 8084
+  #  Crucial for Swagger testing through the API Gateway (8080)
+  forward-headers-strategy: framework
 
 spring:
   application:
-    name: admin-service   # 🔥 IMPORTANT (uppercase)
+    name: ADMIN-SERVICE
 
   datasource:
     url: jdbc:mysql://localhost:3306/admin_db
@@ -18,18 +20,40 @@ spring:
       hibernate:
         format_sql: true
 
-# 🔐 JWT
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+#  Monitoring (Zipkin LATEST FORMAT )
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+#  Swagger Optimization
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    use-root-path: true
+
 jwt:
   secret: finflow_super_secure_jwt_secret_key_2026_project_backend
   expiration: 86400000
 
-# 🔥 EUREKA (ADD THIS)
 eureka:
   instance:
     prefer-ip-address: true
     hostname: localhost
-    lease-renewal-interval-in-seconds: 10
-    lease-expiration-duration-in-seconds: 30
-
   client:
-    registry-fetch-interval-seconds: 10
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
