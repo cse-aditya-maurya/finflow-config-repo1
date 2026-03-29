@@ -1,252 +1,94 @@
-# spring:
-#   cloud:
-#     gateway:
-
-#       routes:
-
-#         # 🔐 AUTH SERVICE
-#         - id: auth-service
-#           uri: lb://auth-service
-#           predicates:
-#             - Path=/auth/**
-#           filters:
-#             - RewritePath=/auth/(?<segment>.*), /${segment}
-
-#         # 📄 APPLICATION SERVICE
-#         - id: application-service
-#           uri: lb://application-service
-#           predicates:
-#             - Path=/applications/**
-#           filters:
-#             - RewritePath=/applications/(?<segment>.*), /${segment}
-
-#         # 📁 DOCUMENT SERVICE
-#         - id: document-service
-#           uri: lb://document-service
-#           predicates:
-#             - Path=/documents/**
-#           filters:
-#             - RewritePath=/documents/(?<segment>.*), /${segment}
-
-#         # 🧑‍💼 ADMIN SERVICE
-#         - id: admin-service
-#           uri: lb://admin-service
-#           predicates:
-#             - Path=/admin/**
-#           filters:
-#             - RewritePath=/admin/(?<segment>.*), /${segment}
-
-#       # 🌍 GLOBAL CORS
-#       globalcors:
-#         corsConfigurations:
-#           '[/**]':
-#             allowedOrigins: "*"
-#             allowedMethods:
-#               - GET
-#               - POST
-#               - PUT
-#               - DELETE
-#             allowedHeaders: "*"
-
-#     discovery:
-#       locator:
-#         enabled: false
-#         lower-case-service-id: true
-
-# # 🔥 Eureka
-# eureka:
-#   instance:
-#     prefer-ip-address: true
-#     hostname: localhost
-#     lease-renewal-interval-in-seconds: 10
-#     lease-expiration-duration-in-seconds: 30
-
-#   client:
-#     service-url:
-#       defaultZone: http://localhost:8761/eureka/
-#     registry-fetch-interval-seconds: 10
-
-# # 🔥 Swagger Aggregation
-# springdoc:
-#   swagger-ui:
-#     path: /swagger-ui.html
-#     urls:
-#       - name: auth-service
-#         # url: /auth/v3/api-docs
-#         url: http://localhost:8080/auth/v3/api-docs
-#       - name: application-service
-#         # url: /applications/v3/api-docs
-#         url: http://localhost:8080/applications/v3/api-docs
-#       - name: document-service
-#         # url: /documents/v3/api-docs
-#         url: http://localhost:8080/documents/v3/api-docs
-#       - name: admin-service
-#         # url: /admin/v3/api-docs
-#         url: http://localhost:8080/admin/v3/api-docs
-
-# # 🔥 Logging
-# logging:
-#   level:
-#     org.springframework.cloud.gateway: DEBUG
-#     reactor.netty.http.client: DEBUG
-
-# # 🔥 Actuator
-# management:
-#   endpoints:
-#     web:
-#       exposure:
-#         include: "*"
-
-# # 🔐 JWT (for later use)
-# jwt:
-#   secret: finflow_super_secure_jwt_secret_key_2026_project_backend
-#   expiration: 86400000
-
-
-
-
-
-
-
-
-
-
-# server:
-#   port: 8080
-
-# spring:
-#   application:
-#     name: api-gateway
-  
-#   cloud:
-#     gateway:
-#       routes:
-#         - id: auth-service
-#           uri: lb://auth-service
-#           predicates:
-#             - Path=/auth/**
-#           filters:
-#             - StripPrefix=0
-            
-#         - id: application-service
-#           uri: lb://application-service
-#           predicates:
-#             - Path=/applications/**
-#           filters:
-#             - StripPrefix=0
-            
-#         - id: document-service
-#           uri: lb://document-service
-#           predicates:
-#             - Path=/documents/**
-#           filters:
-#             - StripPrefix=0
-            
-#         - id: admin-service
-#           uri: lb://admin-service
-#           predicates:
-#             - Path=/admin/**
-#           filters:
-#             - StripPrefix=0
-
-# eureka:
-#   client:
-#     service-url:
-#       defaultZone: http://localhost:8761/eureka/
-#     fetch-registry: true
-#     register-with-eureka: true
-#   instance:
-#     hostname: localhost
-#     prefer-ip-address: true
-
-# springdoc:
-#   swagger-ui:
-#     path: /swagger-ui.html
-#     urls:
-#       - name: Auth Service
-#         url: /auth/v3/api-docs
-#       - name: Application Service
-#         url: /applications/v3/api-docs
-#       - name: Document Service
-#         url: /documents/v3/api-docs
-#       - name: Admin Service
-#         url: /admin/v3/api-docs
-
-# logging:
-#   level:
-#     org.springframework.cloud.gateway: DEBUG
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+server:
+  port: 8080
 
 spring:
+  application:
+    name: API-GATEWAY
+
   cloud:
     gateway:
       routes:
-        # Auth service API routes
+        # 🔐 AUTH SERVICE
         - id: auth-service
-          uri: lb://auth-service
+          uri: lb://AUTH-SERVICE
           predicates:
             - Path=/auth/**
           filters:
-            - StripPrefix=0
-        
-        # Auth service docs route (if you add SpringDoc to auth service)
-        - id: auth-service-docs
-          uri: lb://auth-service
-          predicates:
-            - Path=/auth/v3/api-docs/**
-          filters:
-            - RewritePath=/auth/(?<segment>.*), /$\{segment}
-        
-        # Your other services...
+            - RewritePath=/auth/(?<sub>.*), /${sub}
+
+        #  APPLICATION SERVICE
         - id: application-service
-          uri: lb://application-service
+          uri: lb://APPLICATION-SERVICE
           predicates:
             - Path=/applications/**
           filters:
-            - StripPrefix=0
-            
+            - RewritePath=/applications/(?<sub>.*), /${sub}
+
+        #  DOCUMENT SERVICE
         - id: document-service
-          uri: lb://document-service
+          uri: lb://DOCUMENT-SERVICE
           predicates:
             - Path=/documents/**
           filters:
-            - StripPrefix=0
-            
+            - RewritePath=/documents/(?<sub>.*), /${sub}
+
+        #  ADMIN SERVICE
         - id: admin-service
-          uri: lb://admin-service
+          uri: lb://ADMIN-SERVICE
           predicates:
             - Path=/admin/**
           filters:
-            - StripPrefix=0
+            - RewritePath=/admin/(?<sub>.*), /${sub}
 
+      #  GLOBAL CORS (Spring Boot 3.x Hyphenated)
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origins: "*"
+            allowed-methods: "*"
+            allowed-headers: "*"
+
+#  SWAGGER AGGREGATION (OPTIMIZED )
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+    # This matches the first URL exactly to set it as default
+    primary-name: auth-service
+    display-operation-id: false
+    operations-sorter: alpha
     urls:
-      - name: Auth Service
+      - name: auth-service
         url: /auth/v3/api-docs
-      - name: Application Service
+      - name: application-service
         url: /applications/v3/api-docs
-      - name: Document Service
+      - name: document-service
         url: /documents/v3/api-docs
-      - name: Admin Service
+      - name: admin-service
         url: /admin/v3/api-docs
 
+#  Monitoring (Zipkin LATEST FORMAT )
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+  endpoints:
+    web:
+      exposure:
+        include: gateway,health,info,metrics
 
+# 🌍 EUREKA
+eureka:
+  instance:
+    prefer-ip-address: true
+    hostname: localhost
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+# 🔐 JWT
+jwt:
+  secret: finflow_super_secure_jwt_secret_key_2026_project_backend
+  expiration: 86400000
