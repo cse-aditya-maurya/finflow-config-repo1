@@ -1,7 +1,7 @@
 
 server:
   port: 8081
-  # 🔥 This tells the service to use the Gateway's host/port in Swagger
+  #  This tells the service to use the Gateway's host/port in Swagger
   forward-headers-strategy: framework
 
 spring:
@@ -27,7 +27,7 @@ spring:
     username: guest
     password: guest
 
-# 🔬 Monitoring (Zipkin LATEST FORMAT ✅)
+#  Monitoring (Zipkin LATEST FORMAT )
 management:
   tracing:
     sampling:
@@ -40,7 +40,7 @@ management:
       exposure:
         include: "*"
 
-# 📄 Swagger Optimization
+#  Swagger Optimization
 springdoc:
   api-docs:
     path: /v3/api-docs
