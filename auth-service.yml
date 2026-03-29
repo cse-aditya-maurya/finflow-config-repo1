@@ -1,9 +1,12 @@
+
 server:
   port: 8081
+  # 🔥 This tells the service to use the Gateway's host/port in Swagger
+  forward-headers-strategy: framework
 
 spring:
   application:
-    name: auth-service   # 🔥 IMPORTANT (uppercase for Feign)
+    name: AUTH-SERVICE
 
   datasource:
     url: jdbc:mysql://localhost:3306/auth_db
@@ -18,18 +21,41 @@ spring:
       hibernate:
         format_sql: true
 
-# 🔐 JWT CONFIG
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+# 🔬 Monitoring (Zipkin LATEST FORMAT ✅)
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+# 📄 Swagger Optimization
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    # Ensures relative paths are used through the gateway
+    use-root-path: true
+
 jwt:
   secret: finflow_super_secure_jwt_secret_key_2026_project_backend
   expiration: 86400000
 
-# 🔥 EUREKA CONFIG (MISSING BEFORE)
 eureka:
   instance:
     prefer-ip-address: true
     hostname: localhost
-    lease-renewal-interval-in-seconds: 10
-    lease-expiration-duration-in-seconds: 30
-
   client:
-    registry-fetch-interval-seconds: 10
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
