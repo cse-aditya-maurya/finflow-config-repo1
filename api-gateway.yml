@@ -1,3 +1,114 @@
+# server:
+#   port: 8080
+
+# spring:
+#   application:
+#     name: API-GATEWAY
+
+#   cloud:
+#     gateway:
+#       routes:
+#         # 🔐 AUTH SERVICE
+#         - id: auth-service
+#           uri: lb://AUTH-SERVICE
+#           predicates:
+#             - Path=/auth/**
+#           filters:
+#             - RewritePath=/auth/(?<sub>.*), /${sub}
+
+#         #  APPLICATION SERVICE
+#         - id: application-service
+#           uri: lb://APPLICATION-SERVICE
+#           predicates:
+#             - Path=/applications/**
+#           filters:
+#             - RewritePath=/applications/(?<sub>.*), /${sub}
+
+#         #  DOCUMENT SERVICE
+#         - id: document-service
+#           uri: lb://DOCUMENT-SERVICE
+#           predicates:
+#             - Path=/documents/**
+#           filters:
+#             - RewritePath=/documents/(?<sub>.*), /${sub}
+
+#         #  ADMIN SERVICE
+#         - id: admin-service
+#           uri: lb://ADMIN-SERVICE
+#           predicates:
+#             - Path=/admin/**
+#           filters:
+#             - RewritePath=/admin/(?<sub>.*), /${sub}
+
+#       #  GLOBAL CORS (Spring Boot 3.x Hyphenated)
+#       globalcors:
+#         cors-configurations:
+#           '[/**]':
+#             allowed-origins-patterns: "*"
+#             allowed-methods: "*"
+#             allowed-headers: "*"
+
+# #  SWAGGER AGGREGATION (OPTIMIZED )
+# springdoc:
+#   swagger-ui:
+#     path: /swagger-ui.html
+#     # This matches the first URL exactly to set it as default
+#     primary-name: auth-service
+#     display-operation-id: false
+#     operations-sorter: alpha
+#     urls:
+#       - name: auth-service
+#         url: /auth/v3/api-docs
+#       - name: application-service
+#         url: /applications/v3/api-docs
+#       - name: document-service
+#         url: /documents/v3/api-docs
+#       - name: admin-service
+#         url: /admin/v3/api-docs
+
+# #  Monitoring (Zipkin LATEST FORMAT )
+# management:
+#   tracing:
+#     sampling:
+#       probability: 1.0
+#   zipkin:
+#     tracing:
+#       endpoint: http://localhost:9411/api/v2/spans
+#   endpoints:
+#     web:
+#       exposure:
+#         include: gateway,health,info,metrics
+
+# # 🌍 EUREKA
+# eureka:
+#   instance:
+#     prefer-ip-address: true
+#     hostname: localhost
+#   client:
+#     service-url:
+#       defaultZone: http://localhost:8761/eureka/
+
+# # 🔐 JWT
+# jwt:
+#   secret: finflow_super_secure_jwt_secret_key_2026_project_backend
+#   expiration: 86400000
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 server:
   port: 8080
 
@@ -8,51 +119,43 @@ spring:
   cloud:
     gateway:
       routes:
-        # 🔐 AUTH SERVICE
+        # AUTH SERVICE
         - id: auth-service
           uri: lb://AUTH-SERVICE
           predicates:
             - Path=/auth/**
-          filters:
-            - RewritePath=/auth/(?<sub>.*), /${sub}
 
-        #  APPLICATION SERVICE
+        # APPLICATION SERVICE
         - id: application-service
           uri: lb://APPLICATION-SERVICE
           predicates:
             - Path=/applications/**
-          filters:
-            - RewritePath=/applications/(?<sub>.*), /${sub}
 
-        #  DOCUMENT SERVICE
+        # DOCUMENT SERVICE
         - id: document-service
           uri: lb://DOCUMENT-SERVICE
           predicates:
             - Path=/documents/**
-          filters:
-            - RewritePath=/documents/(?<sub>.*), /${sub}
 
-        #  ADMIN SERVICE
+        # ADMIN SERVICE
         - id: admin-service
           uri: lb://ADMIN-SERVICE
           predicates:
             - Path=/admin/**
-          filters:
-            - RewritePath=/admin/(?<sub>.*), /${sub}
 
-      #  GLOBAL CORS (Spring Boot 3.x Hyphenated)
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+
       globalcors:
         cors-configurations:
           '[/**]':
-            allowed-origins-patterns: "*"
+            allowed-origin-patterns: "*"
             allowed-methods: "*"
             allowed-headers: "*"
 
-#  SWAGGER AGGREGATION (OPTIMIZED )
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
-    # This matches the first URL exactly to set it as default
     primary-name: auth-service
     display-operation-id: false
     operations-sorter: alpha
@@ -66,7 +169,6 @@ springdoc:
       - name: admin-service
         url: /admin/v3/api-docs
 
-#  Monitoring (Zipkin LATEST FORMAT )
 management:
   tracing:
     sampling:
@@ -79,7 +181,6 @@ management:
       exposure:
         include: gateway,health,info,metrics
 
-# 🌍 EUREKA
 eureka:
   instance:
     prefer-ip-address: true
@@ -88,7 +189,6 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka/
 
-# 🔐 JWT
 jwt:
   secret: finflow_super_secure_jwt_secret_key_2026_project_backend
   expiration: 86400000
